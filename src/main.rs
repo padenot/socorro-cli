@@ -8,9 +8,6 @@ struct Cli {
     #[arg(long, value_enum, default_value = "compact", global = true)]
     format: OutputFormat,
 
-    #[arg(long, env = "SOCORRO_API_TOKEN", global = true)]
-    token: Option<String>,
-
     #[command(subcommand)]
     command: Commands,
 }
@@ -64,7 +61,6 @@ fn main() -> Result<()> {
 
     let client = SocorroClient::new(
         "https://crash-stats.mozilla.org/api".to_string(),
-        cli.token,
     );
 
     match cli.command {

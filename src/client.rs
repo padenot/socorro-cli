@@ -5,15 +5,13 @@ use reqwest::StatusCode;
 
 pub struct SocorroClient {
     base_url: String,
-    token: Option<String>,
     client: Client,
 }
 
 impl SocorroClient {
-    pub fn new(base_url: String, token: Option<String>) -> Self {
+    pub fn new(base_url: String) -> Self {
         Self {
             base_url,
-            token,
             client: Client::new(),
         }
     }
@@ -24,11 +22,7 @@ impl SocorroClient {
         }
 
         let url = format!("{}/ProcessedCrash/", self.base_url);
-        let mut request = self.client.get(&url).query(&[("crash_id", crash_id)]);
-
-        if let Some(token) = &self.token {
-            request = request.header("Auth-Token", token);
-        }
+        let request = self.client.get(&url).query(&[("crash_id", crash_id)]);
 
         let response = request.send()?;
 
@@ -79,10 +73,6 @@ impl SocorroClient {
         let mut request = self.client.get(&url);
         for (key, value) in query_params {
             request = request.query(&[(key, value)]);
-        }
-
-        if let Some(token) = &self.token {
-            request = request.header("Auth-Token", token);
         }
 
         let response = request.send()?;
