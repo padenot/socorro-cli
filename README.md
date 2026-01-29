@@ -73,25 +73,10 @@ Full structured data for programmatic processing.
 ### Markdown
 Formatted output for documentation and chat interfaces.
 
-## Configuration
-
-### API Token
-
-For higher rate limits, set an API token:
-
-```bash
-# Via environment variable
-export SOCORRO_API_TOKEN=your_token_here
-
-# Or pass directly
-socorro-cli --token your_token_here crash <crash-id>
-```
-
 ## Options
 
 ### Global Options
 - `--format <FORMAT>`: Output format (compact, json, markdown) [default: compact]
-- `--token <TOKEN>`: Socorro API token (or set SOCORRO_API_TOKEN env var)
 
 ### Crash Options
 - `--depth <N>`: Stack trace depth [default: 10]
