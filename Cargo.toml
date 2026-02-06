@@ -1,11 +1,16 @@
 [package]
 name = "socorro-cli"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MPL-2.0"
 description = "A Rust CLI tool for querying Mozilla's Socorro crash reporting system, optimized for LLM coding agents"
 repository = "https://github.com/padenot/socorro-cli"
 authors = ["Paul Adenot <paul@paul.cx>"]
+
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/{ name }-{ version }-{ target }.{ archive-format }"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
 
 [[bin]]
 name = "socorro-cli"
@@ -22,3 +27,4 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 chrono = "0.4"
+moz-cli-version-check = "0.1"

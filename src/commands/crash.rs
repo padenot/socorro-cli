@@ -1,5 +1,5 @@
+use crate::output::{compact, json, markdown, OutputFormat};
 use crate::{Result, SocorroClient};
-use crate::output::{OutputFormat, compact, json, markdown};
 
 fn extract_crash_id(input: &str) -> &str {
     if input.starts_with("http://") || input.starts_with("https://") {

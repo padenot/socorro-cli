@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use super::StackFrame;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProcessedCrash {
@@ -81,30 +81,32 @@ pub struct CrashSummary {
 
 impl ProcessedCrash {
     pub fn to_summary(&self, depth: usize, all_threads: bool) -> CrashSummary {
-        let crashing_thread_idx = self.crashing_thread
+        let crashing_thread_idx = self
+            .crashing_thread
             .or_else(|| self.crash_info.as_ref().and_then(|ci| ci.crashing_thread))
             .or_else(|| {
                 self.json_dump.as_ref().and_then(|jd| {
-                    jd.get("crashing_thread").and_then(|v| v.as_u64()).map(|v| v as usize)
+                    jd.get("crashing_thread")
+                        .and_then(|v| v.as_u64())
+                        .map(|v| v as usize)
                 })
             });
 
-        let json_dump_threads: Option<Vec<Thread>> = self.json_dump.as_ref()
+        let json_dump_threads: Option<Vec<Thread>> = self
+            .json_dump
+            .as_ref()
             .and_then(|jd| jd.get("threads"))
             .and_then(|t| serde_json::from_value(t.clone()).ok());
 
-        let threads_data = self.threads.as_ref()
-            .or(json_dump_threads.as_ref());
+        let threads_data = self.threads.as_ref().or(json_dump_threads.as_ref());
 
         let (thread_name, frames, thread_summaries) = if let Some(threads) = threads_data {
             let mut all_thread_summaries = Vec::new();
 
             if all_threads {
                 for (idx, thread) in threads.iter().enumerate() {
-                    let frames: Vec<StackFrame> = thread.frames.iter()
-                        .take(depth)
-                        .cloned()
-                        .collect();
+                    let frames: Vec<StackFrame> =
+                        thread.frames.iter().take(depth).cloned().collect();
                     all_thread_summaries.push(ThreadSummary {
                         thread_index: idx,
                         thread_name: thread.thread_name.clone(),
@@ -116,10 +118,8 @@ impl ProcessedCrash {
 
             if let Some(idx) = crashing_thread_idx {
                 if let Some(thread) = threads.get(idx) {
-                    let frames: Vec<StackFrame> = thread.frames.iter()
-                        .take(depth)
-                        .cloned()
-                        .collect();
+                    let frames: Vec<StackFrame> =
+                        thread.frames.iter().take(depth).cloned().collect();
                     (thread.thread_name.clone(), frames, all_thread_summaries)
                 } else {
                     (None, Vec::new(), all_thread_summaries)
@@ -131,26 +131,39 @@ impl ProcessedCrash {
             (None, Vec::new(), Vec::new())
         };
 
-        let json_dump_crash_info: Option<CrashInfo> = self.json_dump.as_ref()
+        let json_dump_crash_info: Option<CrashInfo> = self
+            .json_dump
+            .as_ref()
             .and_then(|jd| jd.get("crash_info"))
             .and_then(|ci| serde_json::from_value(ci.clone()).ok());
 
-        let crash_info = self.crash_info.as_ref()
-            .or(json_dump_crash_info.as_ref());
+        let crash_info = self.crash_info.as_ref().or(json_dump_crash_info.as_ref());
 
         CrashSummary {
             crash_id: self.uuid.clone(),
-            signature: self.signature.clone().unwrap_or_else(|| "Unknown".to_string()),
+            signature: self
+                .signature
+                .clone()
+                .unwrap_or_else(|| "Unknown".to_string()),
             reason: crash_info.and_then(|ci| ci.crash_type.clone()),
             address: crash_info.and_then(|ci| ci.address.clone()),
             moz_crash_reason: self.moz_crash_reason.clone(),
             abort_message: self.abort_message.clone(),
-            product: self.product.clone().unwrap_or_else(|| "Unknown".to_string()),
-            version: self.version.clone().unwrap_or_else(|| "Unknown".to_string()),
+            product: self
+                .product
+                .clone()
+                .unwrap_or_else(|| "Unknown".to_string()),
+            version: self
+                .version
+                .clone()
+                .unwrap_or_else(|| "Unknown".to_string()),
             platform: format!(
                 "{}{}",
                 self.os_name.as_deref().unwrap_or("Unknown"),
-                self.os_version.as_ref().map(|v| format!(" {}", v)).unwrap_or_default()
+                self.os_version
+                    .as_ref()
+                    .map(|v| format!(" {}", v))
+                    .unwrap_or_default()
             ),
             android_version: self.android_version.clone(),
             android_model: self.android_model.clone(),

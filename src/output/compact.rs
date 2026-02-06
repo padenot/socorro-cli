@@ -54,19 +54,24 @@ pub fn format_crash(summary: &CrashSummary) -> String {
         _ => String::new(),
     };
 
-    output.push_str(&format!("product: {} {} ({}{})\n",
-        summary.product,
-        summary.version,
-        summary.platform,
-        device_info
+    output.push_str(&format!(
+        "product: {} {} ({}{})\n",
+        summary.product, summary.version, summary.platform, device_info
     ));
 
     if !summary.all_threads.is_empty() {
         output.push_str("\n");
         for thread in &summary.all_threads {
             let thread_name = thread.thread_name.as_deref().unwrap_or("unknown");
-            let crash_marker = if thread.is_crashing { " [CRASHING]" } else { "" };
-            output.push_str(&format!("stack[thread {}:{}{}]:\n", thread.thread_index, thread_name, crash_marker));
+            let crash_marker = if thread.is_crashing {
+                " [CRASHING]"
+            } else {
+                ""
+            };
+            output.push_str(&format!(
+                "stack[thread {}:{}{}]:\n",
+                thread.thread_index, thread_name, crash_marker
+            ));
 
             for frame in &thread.frames {
                 let func = format_function(frame);
@@ -105,7 +110,8 @@ pub fn format_search(response: &SearchResponse) -> String {
 
     for hit in &response.hits {
         let platform = hit.os_name.as_deref().unwrap_or("Unknown");
-        output.push_str(&format!("{} | {} {} | {} | {}\n",
+        output.push_str(&format!(
+            "{} | {} {} | {} | {}\n",
             &hit.uuid[..8],
             hit.product,
             hit.version,

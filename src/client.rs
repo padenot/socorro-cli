@@ -1,5 +1,5 @@
+use crate::models::{ProcessedCrash, SearchParams, SearchResponse};
 use crate::{Error, Result};
-use crate::models::{ProcessedCrash, SearchResponse, SearchParams};
 use reqwest::blocking::Client;
 use reqwest::StatusCode;
 
@@ -29,16 +29,15 @@ impl SocorroClient {
         match response.status() {
             StatusCode::OK => {
                 let text = response.text()?;
-                serde_json::from_str(&text)
-                    .map_err(|e| Error::ParseError(format!("{}: {}", e, &text[..text.len().min(200)])))
+                serde_json::from_str(&text).map_err(|e| {
+                    Error::ParseError(format!("{}: {}", e, &text[..text.len().min(200)]))
+                })
             }
             StatusCode::NOT_FOUND => Err(Error::NotFound(crash_id.to_string())),
             StatusCode::TOO_MANY_REQUESTS => Err(Error::RateLimited),
-            _ => Err(Error::Http(
-                reqwest::Error::from(
-                    response.error_for_status().unwrap_err()
-                )
-            )),
+            _ => Err(Error::Http(reqwest::Error::from(
+                response.error_for_status().unwrap_err(),
+            ))),
         }
     }
 
@@ -80,13 +79,12 @@ impl SocorroClient {
         match response.status() {
             StatusCode::OK => {
                 let text = response.text()?;
-                serde_json::from_str(&text)
-                    .map_err(|e| Error::ParseError(format!("{}: {}", e, &text[..text.len().min(200)])))
+                serde_json::from_str(&text).map_err(|e| {
+                    Error::ParseError(format!("{}: {}", e, &text[..text.len().min(200)]))
+                })
             }
             StatusCode::TOO_MANY_REQUESTS => Err(Error::RateLimited),
-            _ => Err(Error::Http(
-                response.error_for_status().unwrap_err()
-            )),
+            _ => Err(Error::Http(response.error_for_status().unwrap_err())),
         }
     }
 }

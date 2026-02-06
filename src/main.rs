@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use socorro_cli::{Result, SocorroClient, OutputFormat};
+use socorro_cli::{OutputFormat, Result, SocorroClient};
 
 #[derive(Parser)]
 #[command(name = "socorro-cli")]
@@ -20,10 +20,16 @@ enum Commands {
         #[arg(long, default_value = "10")]
         depth: usize,
 
-        #[arg(long, help = "Output full crash data without omissions (forces JSON format)")]
+        #[arg(
+            long,
+            help = "Output full crash data without omissions (forces JSON format)"
+        )]
         full: bool,
 
-        #[arg(long, help = "Show stacks from all threads (useful for diagnosing deadlocks)")]
+        #[arg(
+            long,
+            help = "Show stacks from all threads (useful for diagnosing deadlocks)"
+        )]
         all_threads: bool,
 
         #[arg(long)]
@@ -57,27 +63,52 @@ enum Commands {
 }
 
 fn main() -> Result<()> {
+    let version_checker =
+        moz_cli_version_check::VersionChecker::new("socorro-cli", env!("CARGO_PKG_VERSION"));
+    version_checker.check_async();
+
+    let result = run();
+
+    version_checker.print_warning();
+
+    result
+}
+
+fn run() -> Result<()> {
     let cli = Cli::parse();
 
-    let client = SocorroClient::new(
-        "https://crash-stats.mozilla.org/api".to_string(),
-    );
+    let client = SocorroClient::new("https://crash-stats.mozilla.org/api".to_string());
 
     match cli.command {
-        Commands::Crash { crash_id, depth, full, all_threads, modules } => {
-            socorro_cli::commands::crash::execute(&client, &crash_id, depth, full, all_threads, modules, cli.format)?;
-        }
-        Commands::Search { signature, product, version, platform, days, limit, facet, sort } => {
-            socorro_cli::commands::search::execute(
+        Commands::Crash {
+            crash_id,
+            depth,
+            full,
+            all_threads,
+            modules,
+        } => {
+            socorro_cli::commands::crash::execute(
                 &client,
-                signature,
-                product,
-                version,
-                platform,
-                days,
-                limit,
-                facet,
-                sort,
+                &crash_id,
+                depth,
+                full,
+                all_threads,
+                modules,
+                cli.format,
+            )?;
+        }
+        Commands::Search {
+            signature,
+            product,
+            version,
+            platform,
+            days,
+            limit,
+            facet,
+            sort,
+        } => {
+            socorro_cli::commands::search::execute(
+                &client, signature, product, version, platform, days, limit, facet, sort,
                 cli.format,
             )?;
         }

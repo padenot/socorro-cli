@@ -1,6 +1,6 @@
-use crate::{Result, SocorroClient};
 use crate::models::SearchParams;
-use crate::output::{OutputFormat, compact, json, markdown};
+use crate::output::{compact, json, markdown, OutputFormat};
+use crate::{Result, SocorroClient};
 
 pub fn execute(
     client: &SocorroClient,

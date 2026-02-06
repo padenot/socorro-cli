@@ -37,7 +37,10 @@ pub fn format_crash(summary: &CrashSummary) -> String {
         };
 
         if !addr_str.is_empty() {
-            output.push_str(&format!("- **Crash Reason:** {} at `{}`{}\n", reason, addr_str, addr_desc));
+            output.push_str(&format!(
+                "- **Crash Reason:** {} at `{}`{}\n",
+                reason, addr_str, addr_desc
+            ));
         } else {
             output.push_str(&format!("- **Crash Reason:** {}\n", reason));
         }
@@ -57,15 +60,28 @@ pub fn format_crash(summary: &CrashSummary) -> String {
         _ => String::new(),
     };
 
-    output.push_str(&format!("- **Product:** {} {}\n", summary.product, summary.version));
-    output.push_str(&format!("- **Platform:** {}{}\n\n", summary.platform, device_info));
+    output.push_str(&format!(
+        "- **Product:** {} {}\n",
+        summary.product, summary.version
+    ));
+    output.push_str(&format!(
+        "- **Platform:** {}{}\n\n",
+        summary.platform, device_info
+    ));
 
     if !summary.all_threads.is_empty() {
         output.push_str("## All Threads\n\n");
         for thread in &summary.all_threads {
             let thread_name = thread.thread_name.as_deref().unwrap_or("unknown");
-            let crash_marker = if thread.is_crashing { " **[CRASHING]**" } else { "" };
-            output.push_str(&format!("### Thread {} ({}){}\n\n", thread.thread_index, thread_name, crash_marker));
+            let crash_marker = if thread.is_crashing {
+                " **[CRASHING]**"
+            } else {
+                ""
+            };
+            output.push_str(&format!(
+                "### Thread {} ({}){}\n\n",
+                thread.thread_index, thread_name, crash_marker
+            ));
             output.push_str("```\n");
 
             for frame in &thread.frames {
@@ -114,7 +130,8 @@ pub fn format_search(response: &SearchResponse) -> String {
 
         for hit in &response.hits {
             let platform = hit.os_name.as_deref().unwrap_or("Unknown");
-            output.push_str(&format!("| {} | {} | {} | {} | {} |\n",
+            output.push_str(&format!(
+                "| {} | {} | {} | {} | {} |\n",
                 &hit.uuid[..8],
                 hit.product,
                 hit.version,
@@ -130,7 +147,10 @@ pub fn format_search(response: &SearchResponse) -> String {
         for (field, buckets) in &response.facets {
             output.push_str(&format!("### {}\n\n", field));
             for bucket in buckets {
-                output.push_str(&format!("- **{}**: {} crashes\n", bucket.term, bucket.count));
+                output.push_str(&format!(
+                    "- **{}**: {} crashes\n",
+                    bucket.term, bucket.count
+                ));
             }
             output.push_str("\n");
         }
